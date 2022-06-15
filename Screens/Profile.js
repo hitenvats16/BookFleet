@@ -2,7 +2,6 @@ import { onAuthStateChanged, updateProfile } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, StatusBar, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
 import { auth, db } from '../firebase/firebase';
-import useAuth from '../hooks/UseAuth';
 import * as ImagePicker from 'expo-image-picker';
 import { colorPallet } from '../constants/colorpallet';
 import { AntDesign } from '@expo/vector-icons';
@@ -12,7 +11,6 @@ import { collection, getDocs } from 'firebase/firestore';
 export default function Profile({navigation}) {
 
     const [ image, setImage ] = useState();
-    const { setLogin } = useAuth();
     const [ DialogVisible, setVisibilty ] = useState(false);
     const [ name,setName ] = useState();
     const [books,setBooks] = useState([]);
@@ -95,7 +93,7 @@ export default function Profile({navigation}) {
                     Alert.alert("Confirmation", "Do you really want to SignOut??", [
                         {
                             text: 'Yes',
-                            onPress: () => { setLogin(false); auth.signOut(); }
+                            onPress: () => { auth.signOut(); }
                         },
                         {
                             text: 'No'

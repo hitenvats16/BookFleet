@@ -17,24 +17,11 @@ export default function AddBook({ navigation }) {
     const [Author, setAuthor] = useState();
     const [Publisher, setPublisher] = useState();
     const [image, setImage] = useState(null);
-    const [picker, setPicker] = useState();
-    const [uploadUrl, setUploadUrl] = useState();
+    const [uploadUrl, setUploadUrl] = useState("");
     const [isloading, setLoading] = useState(false);
+    const uniqueId = uuidv4();
 
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
-
-        if (!result.cancelled) {
-            setImage(result.uri);
-            setPicker(result);
-        }
-    };
-
+    // function uploads data to database(firestore)
     const HandleUploadDataToDB = async () => {
         try {
             await addDoc(collection(db, "Books"), {
@@ -50,17 +37,37 @@ export default function AddBook({ navigation }) {
         }
     }
 
+    // given function let to picj images from device
+    const pickImage = async () => {
+        setLoading(true);
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.cancelled) {
+            _handleImagePicked(result.uri);
+            setImage(result.uri)
+            console.log(result.uri);
+        }
+    };
+
+    //function to instatiate the upload of picked image to databse(firebase storage)
     async function _handleImagePicked(pickerResult) {
         setLoading(true);
         let _uploadUrl;
         if (!pickerResult.cancelled) {
-            _uploadUrl = await uploadImageAsync(pickerResult.uri);
+            _uploadUrl = await uploadImageAsync(pickerResult);
+            setUploadUrl(_uploadUrl);
+            console.log(_uploadUrl);
         }
-        setUploadUrl(_uploadUrl);
         setLoading(false);
         return;
     }
 
+    //function to upload image to database(firebase storage)
     async function uploadImageAsync(uri) {
         const blob = await new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
@@ -75,7 +82,7 @@ export default function AddBook({ navigation }) {
             xhr.open("GET", uri, true);
             xhr.send(null);
         });
-        let id = uuidv4();
+        let id = uniqueId;
         const fileRef = ref(getStorage(), id);
         await uploadBytes(fileRef, blob);
         blob.close();
@@ -124,11 +131,6 @@ export default function AddBook({ navigation }) {
                     </Picker>
                     <TouchableOpacity style={styles.btn} onPress={async () => {
                         if (Title && Author && Publisher && Condition && image) {
-                            await _handleImagePicked(picker);
-                            if (!uploadUrl) {
-                                ToastAndroid.showWithGravity("Please press Button again", ToastAndroid.SHORT, ToastAndroid.BOTTOM);
-                                return;
-                            }
                             await HandleUploadDataToDB();
                             ToastAndroid.showWithGravity("data uploaded succesfully", ToastAndroid.SHORT, ToastAndroid.BOTTOM);
                             navigation.goBack();

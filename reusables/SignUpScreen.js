@@ -3,11 +3,8 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { colorPallet } from "../constants/colorpallet";
 import { auth } from '../firebase/firebase';
-import useAuth from '../hooks/UseAuth';
 
 export default function SignUpScreen({ navigation }) {
-
-    const { setLogin } = useAuth();
 
     const [email, setEmail] = useState();
     const [name, setName] = useState();
@@ -15,13 +12,13 @@ export default function SignUpScreen({ navigation }) {
     const [confpass, setConfpass] = useState();
     const [isloading, setloading] = useState(false);
 
+    // function to handle signup
     const HandleSigup = async ()=>{
         if(pass!=confpass) alert("password does not match")
         setloading(true);
         createUserWithEmailAndPassword(auth,email,pass)
             .then( async(userInfo) => {
                 await updateProfile(auth.currentUser,{ displayName: name })
-                setLogin(true);
             })
             .catch(e=>{
                 alert(e.message);

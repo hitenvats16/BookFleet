@@ -1,28 +1,13 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { colorPallet } from '../constants/colorpallet';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import Screen1 from './SignInScreen';
-import Screen2 from './SignUpScreen';
-import { useEffect } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebase/firebase';
-import useAuth from '../hooks/UseAuth';
+import Screen1 from '../reusables/SignInScreen';
+import Screen2 from '../reusables/SignUpScreen';
+
 
 const Tab = createMaterialTopTabNavigator();
 
 export default function HybridScreen({ navigation }) {
-
-    const { setLogin, setDisplayName } = useAuth();
-
-    useEffect(()=>{
-        onAuthStateChanged(auth,(userData)=>{
-            if(userData){
-                setLogin(true);
-                setDisplayName(userData.displayName);
-            }
-        })
-    },[]);
-
     return (
         <View style={styles.cont}>
             <Text style={styles.heading}>Continue to App</Text>

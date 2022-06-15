@@ -3,28 +3,25 @@ import { useState } from "react";
 import { View, StyleSheet, Text, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { colorPallet } from "../constants/colorpallet";
 import { auth } from "../firebase/firebase";
-import useAuth from "../hooks/UseAuth";
 
 export default function SignInScreen({ navigation }) {
-
-    const { setLogin } = useAuth();
 
     const [email, setEmail] = useState();
     const [pass, setPass] = useState();
     const [loadingSignIN, setloadingsi] = useState(false);
     const [loadingPass, setloadingPass] = useState(false);
 
+    //fucntion to handle signin 
     const HandleSignIn = async () => {
         setloadingsi(true);
         signInWithEmailAndPassword(auth, email, pass)
-            .then(() => {
-                setLogin(true);
-            })
             .catch(e => {
                 alert(e.message);
             })
             .finally(()=>{ setloadingsi(false); });
     }
+    
+    // function to handle Password reset via email
     const HandlePassReset = async () => {
         setloadingPass(true);
         sendPasswordResetEmail(auth, email)

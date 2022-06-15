@@ -2,28 +2,22 @@ import { StyleSheet, ScrollView, StatusBar, TouchableOpacity, View, ActivityIndi
 import Card from '../reusables/Card';
 import { useEffect, useState } from 'react';
 import { db } from '../firebase/firebase';
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
 import { colorPallet } from '../constants/colorpallet';
 
 export default function Home({ navigation }) {
-    // const [books, setBooks] = useState({});
     const [isLoading, setLoading] = useState(false);
     const [books, setBooks] = useState([]);
 
-    async function getDataFromFirestore() {
-        const dataRefrence = collection(db, "Books");
-        const retrievedData = await getDocs(dataRefrence);
-        let tempBooks = [];
-        retrievedData.forEach((data) => {
-            tempBooks.push(data.data());
-        })
-        setBooks(tempBooks);
-        console.log(books);
-    }
-
     useEffect(async () => {
         setLoading(true);
-        await getDataFromFirestore();
+        onSnapshot(collection(db, "Books"),(doc)=>{
+            let tempBooks = [];
+            doc.forEach(doc=>{
+                tempBooks.push(doc.data());
+            })
+            setBooks(tempBooks);
+        })
         setLoading(false);
     }, [])
 
@@ -56,7 +50,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 10,
         backgroundColor: '#f5f5f5',
-        marginTop: StatusBar.currentHeight
+        paddingTop: StatusBar.currentHeight
     }
 })
 
